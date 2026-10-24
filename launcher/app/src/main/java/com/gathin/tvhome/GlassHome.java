@@ -932,7 +932,8 @@ public class GlassHome extends Activity {
                     if (e.getRepeatCount() == 0) {
                         okDown = code;
                         longFired = false;
-                    } else if (!longFired && okDown == code && e.getEventTime() - e.getDownTime() >= LONG_PRESS_MS) {
+                    } else if (!longFired && okDown == code
+                            && (e.isLongPress() || e.getEventTime() - e.getDownTime() >= LONG_PRESS_MS)) {
                         longFired = true;
                         if (!moving) showTileMenu();
                     }
