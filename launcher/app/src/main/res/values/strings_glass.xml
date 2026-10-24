@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Glass Home (GlassHome, design/SPEC.md). English only for now; other languages fall back to these. -->
+<resources>
+    <string name="glass_all_apps">All apps</string>
+    <string name="glass_press_open">Press OK to open</string>
+    <string name="glass_press_switch">Press OK to switch to %1$s</string>
+    <string name="glass_press_input">Press OK to switch input</string>
+    <string name="glass_nothing_connected">Nothing connected</string>
+    <string name="glass_opens_system">Opens the system %1$s screen</string>
+    <string name="glass_toast_opening">Opening %1$s</string>
+    <string name="glass_toast_switching">Switching to %1$s</string>
+    <!-- "Switching to HDMI 2 · Zee Tamil" -->
+    <string name="glass_toast_zee">Switching to %1$s · %2$s</string>
+    <string name="glass_toast_home">Home</string>
+    <string name="glass_move_hint">Left and Right move it, OK places it</string>
+</resources>

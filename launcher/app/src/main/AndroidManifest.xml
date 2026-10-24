@@ -78,8 +78,9 @@
         android:allowBackup="false"
         android:localeConfig="@xml/locales_config">
 
+        <!-- This fork's Home: the glass layout (design/SPEC.md). -->
         <activity
-            android:name=".MainActivity"
+            android:name=".GlassHome"
             android:exported="true"
             android:launchMode="singleTask"
             android:stateNotNeeded="true"
@@ -98,6 +99,18 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- The reference launcher's grid Home, no longer answering HOME in this fork; InputsRequestActivity
+             still opens it for handle_view_inputs. -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:stateNotNeeded="true"
+            android:excludeFromRecents="true"
+            android:clearTaskOnLaunch="true"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden|uiMode"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name=".LauncherSettingsActivity"

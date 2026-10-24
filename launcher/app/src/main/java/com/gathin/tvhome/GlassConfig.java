@@ -46,10 +46,12 @@ final class GlassConfig {
     final String zeeLabel;
     /** The wallpaper, a file in the theme's wallpapers/ folder; the bundled one when it is missing. */
     final File wallpaper;
+    /** TV row: what each tile opens, "Sound=pkg/.Activity|android.settings.SOUND_SETTINGS" (first that resolves). */
+    final Map<String, String> toolIntents;
 
     private GlassConfig(List<String> homeApps, Map<String, Integer> accents, Map<String, String> subs,
                         Map<String, String> inputLabels, String zeeName, String zeeInput, String zeeChannel,
-                        String zeeLabel, File wallpaper) {
+                        String zeeLabel, File wallpaper, Map<String, String> toolIntents) {
         this.homeApps = Collections.unmodifiableList(homeApps);
         this.accents = Collections.unmodifiableMap(accents);
         this.subs = Collections.unmodifiableMap(subs);
@@ -59,6 +61,7 @@ final class GlassConfig {
         this.zeeChannel = zeeChannel;
         this.zeeLabel = zeeLabel;
         this.wallpaper = wallpaper;
+        this.toolIntents = Collections.unmodifiableMap(toolIntents);
     }
 
     static GlassConfig load(Context ctx, Config base) {
@@ -67,6 +70,7 @@ final class GlassConfig {
         List<String> accents = list(res, R.array.app_accents);
         List<String> subs = list(res, R.array.app_subs);
         List<String> inputLabels = list(res, R.array.input_labels);
+        List<String> toolIntents = list(res, R.array.tool_intents);
         String zeeName = res.getString(R.string.zee_name).trim();
         String zeeInput = res.getString(R.string.zee_input).trim();
         String zeeChannel = res.getString(R.string.zee_channel).trim();
@@ -79,6 +83,7 @@ final class GlassConfig {
             accents = merged(accents, Config.stringList(json, "app_accents", Collections.emptyList()));
             subs = merged(subs, Config.stringList(json, "app_subs", Collections.emptyList()));
             inputLabels = merged(inputLabels, Config.stringList(json, "input_labels", Collections.emptyList()));
+            toolIntents = merged(toolIntents, Config.stringList(json, "tool_intents", Collections.emptyList()));
             zeeName = Config.string(json, "zee_name", zeeName);
             zeeInput = Config.string(json, "zee_input", zeeInput);
             zeeChannel = Config.string(json, "zee_channel", zeeChannel);
@@ -94,7 +99,7 @@ final class GlassConfig {
         }
         return new GlassConfig(homeApps, colors(Config.packageMap(accents)), Config.packageMap(subs),
                 Config.packageMap(inputLabels), zeeName, zeeInput.isEmpty() ? "HDMI 2" : zeeInput, zeeChannel,
-                zeeLabel, wallpaper);
+                zeeLabel, wallpaper, Config.packageMap(toolIntents));
     }
 
     int accent(String key) {

@@ -460,6 +460,18 @@
          android.permission.HDMI_CEC, which only system apps get (NOTES.md). -->
     <string name="zee_channel" translatable="false"></string>
     <string name="zee_label" translatable="false">Zee Tamil</string>
-    <!-- A file in the theme's wallpapers/ folder; the bundled glass_wallpaper.webp when missing. -->
+    <!-- The TV row: what each tile opens, "Name=target|target". A target is a component (pkg/.Activity) or an
+         action; the first that resolves to a single screen is used, else the general Settings screen. Checked on
+         MiTV-AXSO0 (PI.6036): SOUND_SETTINGS has three handlers there (a chooser), so Sound names Xiaomi's screen;
+         DISPLAY_SETTINGS opens an empty droidlogic panel and nothing answers DREAM_SETTINGS or a sleep timer, so
+         Picture and Sleep fall back to Settings. -->
+    <string-array name="tool_intents" translatable="false">
+        <item>Settings=android.settings.SETTINGS</item>
+        <item>Network=android.settings.WIFI_SETTINGS</item>
+        <item>Sound=com.android.tv.settings/com.xiaomi.mitv.settings.sound.SoundActivity|android.settings.SOUND_SETTINGS</item>
+        <item>Picture=android.settings.PICTURE_SETTINGS</item>
+        <item>Sleep=android.settings.DREAM_SETTINGS</item>
+    </string-array>
+    <!-- A file in the theme's wallpapers/ folder; the bundled res/raw/glass_wallpaper.webp when missing. -->
     <string name="glass_wallpaper" translatable="false">glass.webp</string>
 </resources>

@@ -5,7 +5,7 @@ Writes:
   themes/mitv-glass/wallpapers/glass.webp           1920x1080 wallpaper: four soft colour blobs (blue, magenta,
                                                     teal, violet) on #0a1326, blurred and saturated like the
                                                     mockup's CSS (blur 34px, saturate 130%)
-  launcher/.../res/drawable-nodpi/glass_wallpaper.webp   the same image, the launcher's fallback when no theme is pushed
+  launcher/.../res/raw/glass_wallpaper.webp            the same image, the launcher's fallback when no theme is pushed
   launcher/.../res/drawable-tvdpi/tile_shadow.9.png       tile shadow at rest: 0 12px 30px black 28% (SPEC section 2)
   launcher/.../res/drawable-tvdpi/tile_shadow_focus.9.png focused tile shadow: 0 28px 56px black 55%
 
@@ -102,7 +102,7 @@ def main():
     out = Path(args.wallpaper)
     out.parent.mkdir(parents=True, exist_ok=True)
     wall.save(out, "WEBP", quality=88, method=6)
-    fallback = RES / "drawable-nodpi/glass_wallpaper.webp"
+    fallback = RES / "raw/glass_wallpaper.webp"
     fallback.parent.mkdir(parents=True, exist_ok=True)
     wall.save(fallback, "WEBP", quality=88, method=6)
     print(f"{out} ({out.stat().st_size} B), {fallback} ({fallback.stat().st_size} B)")
