@@ -34,7 +34,7 @@
     </string-array>
 
     <!-- The TV's Live TV / tuner app, offered at the end of the Inputs menu. Leave empty to omit. -->
-    <string name="live_tv_package" translatable="false">com.mediatek.wwtv.tvcenter</string>
+    <string name="live_tv_package" translatable="false">com.android.tv</string>
 
     <!-- Open the Live TV app above the first time Home comes up after the TV is switched on, for sets that are
          mostly used for broadcast TV. Once per boot: Home after that stays Home. Can also be set with
@@ -69,6 +69,9 @@
 
     <!-- A tile's name instead of the app's own: "package=Name". It also shows above the dock. -->
     <string-array name="app_labels">
+        <item>in.startv.hotstar=Hotstar</item>
+        <item>com.amazon.amazonvideo.livingroom=Prime Video</item>
+        <item>com.android.tv=Live TV</item>
     </string-array>
     <!-- A tile's artwork instead of the app's banner: "package=drawable", a banner_* drawable bundled with the
          launcher (res/drawable). banner_tv is a magenta field with the Live TV glyph. -->
@@ -314,7 +317,7 @@
     <bool name="show_home_settings_shortcut">false</bool>
 
     <!-- Installed launchable apps, including ordinary Android apps. Also settable in config.json. -->
-    <bool name="app_library">false</bool>
+    <bool name="app_library">true</bool>
     <!-- Every app tile is its icon on a card tinted from that icon, name only under the focused tile,
          instead of each app's own banner. Off by default; a theme can set "uniform_tiles": true. -->
     <bool name="uniform_tiles">false</bool>
@@ -414,4 +417,49 @@
          faint outer glow), rim (the crisp rim alone, no sheen, fill or glow, for a quiet focus over a wallpaper) or
          halo (the rim with a lighter outer glow). Can also be set with "glass_style": "rim" in a theme's config.json. -->
     <string name="glass_style" translatable="false">glass</string>
+
+    <!-- ==== Glass Home (GlassHome, design/SPEC.md). A theme's config.json overrides each of these. ==== -->
+    <!-- The Apps row, in this order (not alphabetical). Package names, plus @zee (the Zee TV shortcut, which
+         switches to zee_input) and @all_apps (the App library). Apps that are not installed are skipped. -->
+    <string-array name="home_apps" translatable="false">
+        <item>com.google.android.youtube.tv</item>
+        <item>com.netflix.ninja</item>
+        <item>com.amazon.amazonvideo.livingroom</item>
+        <item>in.startv.hotstar</item>
+        <item>@zee</item>
+        <item>com.android.tv</item>
+        <item>@all_apps</item>
+    </string-array>
+    <!-- Tile accent, "entry=#rrggbb". An app missing here takes its icon's dominant colour. -->
+    <string-array name="app_accents" translatable="false">
+        <item>com.google.android.youtube.tv=#e0262c</item>
+        <item>com.netflix.ninja=#c4162a</item>
+        <item>com.amazon.amazonvideo.livingroom=#1188c7</item>
+        <item>in.startv.hotstar=#1e4fd1</item>
+        <item>@zee=#7a2cc9</item>
+        <item>com.android.tv=#2aa876</item>
+        <item>@all_apps=#5b6a80</item>
+    </string-array>
+    <!-- The line under the name in the hero, "entry=text". -->
+    <string-array name="app_subs" translatable="false">
+        <item>com.google.android.youtube.tv=Subscriptions</item>
+        <item>com.netflix.ninja=Continue watching</item>
+        <item>com.amazon.amazonvideo.livingroom=Movies &amp; series</item>
+        <item>in.startv.hotstar=Live sport &amp; shows</item>
+        <item>@zee=Zee Tamil on Jio set-top box</item>
+        <item>com.android.tv=Indian channels</item>
+        <item>@all_apps=Everything installed</item>
+    </string-array>
+    <!-- Names for the Inputs row, "HDMI 1=Set-top box". They win over the name set in Settings > Inputs. -->
+    <string-array name="input_labels" translatable="false">
+        <item>HDMI 2=Jio set-top box</item>
+    </string-array>
+    <string name="zee_name" translatable="false">Zee TV</string>
+    <string name="zee_input" translatable="false">HDMI 2</string>
+    <!-- Channel digits for the set-top box. Not sent: this TV's set-top box answers no CEC, and CEC keys need
+         android.permission.HDMI_CEC, which only system apps get (NOTES.md). -->
+    <string name="zee_channel" translatable="false"></string>
+    <string name="zee_label" translatable="false">Zee Tamil</string>
+    <!-- A file in the theme's wallpapers/ folder; the bundled glass_wallpaper.webp when missing. -->
+    <string name="glass_wallpaper" translatable="false">glass.webp</string>
 </resources>
