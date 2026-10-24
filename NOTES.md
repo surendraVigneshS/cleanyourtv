@@ -113,3 +113,56 @@ which inflates cached PSS):
 - Setting restored to 0 afterwards.
 - **Decision for Phase 2:** the Zee TV tile switches to HDMI 2 and stops there. `zee_channel` stays in the config
   for the record but is not sent.
+
+## Phase 2: glass Home (branch glass-home)
+
+What changed: `GlassHome` is the HOME activity; `MainActivity` (the grid/dock Home) stays in the APK without the
+HOME filter. New: `GlassHome`, `GlassTile` (one view per tile, whole tile in one onDraw), `TileRow` (track, focus
+memory, slide), `WashView` (accent wash), `GlassConfig` (SPEC section 9 keys), `InputSwitch` (input switching moved
+out of MainActivity unchanged, plus port lookup). Kept: Config + theme overlay, leanback launch intents and
+`launch_actions`, App library (`AppLibraryDialog`, `LibraryApps`), tile Move menu (`Order`), `SystemSettings`.
+
+- Layout units: the TV panel is 1280x720 at density 213, so the spec's 1920x1080 design px are scaled by
+  width/1920 at runtime (one design px = 0.667 device px here).
+- Fit: with SPEC's exact sizes the TV row would end ~59 px below the safe area (the mockup overflows the same way).
+  Rows clip only sideways, so the 1.12x zoom/ring spills into the 34 px gaps instead of needing padding; the focused
+  TV tile now ends at 1013 of the 1026 px safe bottom. Tiles start 42 px into the row so the first tile, zoomed with
+  its ring, keeps the 20 px margin; row labels line up with the tiles.
+- Glass, the cheap way: wallpaper blurred offline (`tools/glass_assets.py`, 1920x1080 WebP, 16 KB) and decoded once
+  at screen size off the main thread with the scrim painted in; tile shadows are baked nine-patches; no RenderScript,
+  no runtime blur, no video. Fonts: Outfit and Manrope variable TTFs in res/font, system sans-serif as fallback.
+- Icons: `getApplicationIcon()` on the background thread, rendered at slot size with rounded corners, kept in an
+  LruCache for the process. Accent: config, else Palette dominant colour, else #5b6a80.
+- Inputs row: HDMI 1-3 and AV from `TvInputManager` (CEC child inputs fold into their port); labels from
+  `input_labels`, else the name set in Settings > Inputs; the dot follows `TvInputCallback.onInputStateChanged`,
+  registered only while Home is visible.
+- TV row targets (verified on this firmware): Settings -> `android.settings.SETTINGS` (TvSettings MainSettings);
+  Network -> `WIFI_SETTINGS` (NetworkActivity); Sound -> Xiaomi `com.xiaomi.mitv.settings.sound.SoundActivity`
+  (`SOUND_SETTINGS` has three handlers here, which would show a chooser); Picture and Sleep -> general Settings.
+- Zee TV: switches to HDMI 2 only (see CEC above); toast "Switching to HDMI 2 · Zee Tamil".
+
+Build: `cd launcher && ./gradlew --no-daemon assembleRelease lintRelease` -> lint 0 errors. Release APK 627 KB
+(budget 2 MB; above upstream's 512 KB CI gate, mainly Manrope's 165 KB - only matters for an upstream PR).
+
+## Phase 3: verified on the TV (installed, started with am start, not Home yet)
+
+Every tile pressed through the remote's key path (`input keyevent`), result read from `dumpsys activity`:
+
+| Tile | Opens |
+|---|---|
+| YouTube / Netflix / Prime Video / Hotstar | the app's own main activity |
+| Zee TV | Live TV on `Hdmi2InputService/HW6` |
+| Live TV | `com.android.tv/.MainActivity` (resumes its last input) |
+| All apps | App library popup |
+| HDMI 1 / 2 / 3 / AV | Live TV on HW5 / HW6 / HW7 / AV1 HW1 |
+| Settings / Network / Sound | MainSettings / NetworkActivity / Xiaomi Sound |
+| Picture / Sleep | MainSettings (fallback) |
+
+Navigation: Right to the end slides the Apps track; Down lands on each row's remembered column; Back returns to
+Apps, first tile. Hold OK -> Move / App info menu; Move + Right + OK reordered YouTube and Netflix and the order
+survived a force-stop (then moved back).
+
+Launcher PSS at idle, `tools/bench.py`'s `pss_of` (dumpsys meminfo TOTAL), 5 samples 30-50 s after a cold start:
+**30-32 MB** (31,506 KB: Java 3.0 MB, native 8.5 MB incl. the 3.7 MB wallpaper, code 7.8 MB). Budget 60 MB.
+Stock tvlauncher on the same TV: 78.8 MB. The full `bench.py` run (key latency, cold start, return to Home) needs
+the launcher to be Home and is run after the handover.
