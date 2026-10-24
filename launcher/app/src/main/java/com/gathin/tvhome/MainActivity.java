@@ -2793,77 +2793,14 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         }
     }
 
-    /** `input_sources` in config.xml: "HW5=23" maps the framework input whose id ends in /HW5 to a vendor
-     *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
-     *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
+    /** `input_sources` lookup; see InputSwitch.mappedSource. */
     private Integer mappedSource(String inputId) {
-        if (inputId == null) return null;
-        String hw = inputId.substring(inputId.lastIndexOf('/') + 1);
-        for (String m : getResources().getStringArray(R.array.input_sources)) {
-            int eq = m.indexOf('=');
-            if (eq <= 0 || !m.substring(0, eq).trim().equals(hw)) continue;
-            String v = m.substring(eq + 1).trim();
-            if (v.equals("-")) return -1;
-            try { return Integer.parseInt(v); } catch (NumberFormatException e) { return null; }
-        }
-        return null;
+        return InputSwitch.mappedSource(this, inputId);
     }
 
-    /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-     *  `input_action` with its source number as the int extra "input" (Xiaomi China firmware, whose tvplayer
-     *  answers com.xiaomi.mitv.tvplayer.EXTSRC_PLAY and nothing else). Otherwise the standard way is
-     *  ACTION_VIEW on its channel URI, which the Live TV app handles; where nothing takes that, the
-     *  configured `input_action` is sent with the same URI instead (XGIMI's HDMI player only answers
-     *  com.xgimi.action.hdmiPlayer). With `input_uri_scheme` set (YaOS: live-tv) the same URI goes out
-     *  with that scheme and no MIME type. A player guarded by a permission this build does not declare
-     *  throws SecurityException, which used to take Home down with it (YaOS before the manifest asked
-     *  for ACCESS_TV_SOURCE). */
+    /** Switches to a passthrough input (HDMI, AV); see InputSwitch.open. */
     private void openInput(String inputId) {
-        // A CEC device is a child input of its HDMI port; the vendor source number belongs to the port
-        // (MiTV-MFFU0). Only that lookup uses the parent: the generic path below still opens the child.
-        String sourceId = inputId;
-        TvInputManager tim = (TvInputManager) getSystemService(TV_INPUT_SERVICE);
-        if (tim != null) {
-            try {
-                TvInputInfo info = tim.getTvInputInfo(inputId);
-                if (info != null && info.getParentId() != null) sourceId = info.getParentId();
-            } catch (RuntimeException ignored) {
-            }
-        }
-        Integer source = mappedSource(sourceId);
-        if (source != null && source >= 0 && !inputAction.isEmpty()) {
-            try {
-                startActivity(new Intent(inputAction).putExtra("input", source.intValue())
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                return;
-            } catch (ActivityNotFoundException | SecurityException e) {
-                // fall through to the standard way
-            }
-        }
-        Uri uri = TvContract.buildChannelUriForPassthroughInput(inputId);
-        Intent view = (inputUriScheme.isEmpty()
-                ? new Intent(Intent.ACTION_VIEW).setDataAndType(uri, "vnd.android.cursor.item/channel")
-                : new Intent(Intent.ACTION_VIEW, uri.buildUpon().scheme(inputUriScheme).build()))
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        // Aim it at the TV app first: apps installed later (a streaming app, a file manager) can claim the same
-        // channel URI too, and with two or more handlers Android shows a chooser instead of the input (WhaleOS).
-        if (!liveTvPkg.isEmpty()) {
-            try {
-                startActivity(new Intent(view).setPackage(liveTvPkg));
-                return;
-            } catch (ActivityNotFoundException | SecurityException ignored) {
-            }
-        }
-        try {
-            startActivity(view);
-            return;
-        } catch (ActivityNotFoundException | SecurityException e) {
-            if (inputAction.isEmpty()) {
-                Toast.makeText(this, R.string.not_available, Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-        open(new Intent(inputAction).setDataAndType(uri, "vnd.android.cursor.item/channel"));
+        InputSwitch.open(this, inputId, liveTvPkg, inputAction, inputUriScheme);
     }
 
     /** Dropdown menu under the Inputs pill: HDMI ports (with connection state), AV and Live TV. */
