@@ -1,0 +1,35 @@
+{
+  "greeting_name": "Sura",
+  "home_apps": [
+    "com.google.android.youtube.tv",
+    "com.netflix.ninja",
+    "com.amazon.amazonvideo.livingroom",
+    "in.startv.hotstar",
+    "@zee",
+    "com.android.tv",
+    "@all_apps"
+  ],
+  "app_accents": [
+    "com.google.android.youtube.tv=#e0262c",
+    "com.netflix.ninja=#c4162a",
+    "com.amazon.amazonvideo.livingroom=#1188c7",
+    "in.startv.hotstar=#1e4fd1",
+    "@zee=#7a2cc9",
+    "com.android.tv=#2aa876",
+    "@all_apps=#5b6a80"
+  ],
+  "app_labels": [
+    "in.startv.hotstar=Hotstar",
+    "com.amazon.amazonvideo.livingroom=Prime Video",
+    "com.android.tv=Live TV"
+  ],
+  "input_labels": [
+    "HDMI 2=Jio set-top box"
+  ],
+  "zee_input": "HDMI 2",
+  "zee_channel": "",
+  "zee_label": "Zee Tamil",
+  "glass_wallpaper": "glass.webp",
+  "live_tv_package": "com.android.tv",
+  "app_library": true
+}
