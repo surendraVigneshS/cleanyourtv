@@ -166,3 +166,53 @@ Launcher PSS at idle, `tools/bench.py`'s `pss_of` (dumpsys meminfo TOTAL), 5 sam
 **30-32 MB** (31,506 KB: Java 3.0 MB, native 8.5 MB incl. the 3.7 MB wallpaper, code 7.8 MB). Budget 60 MB.
 Stock tvlauncher on the same TV: 78.8 MB. The full `bench.py` run (key latency, cold start, return to Home) needs
 the launcher to be Home and is run after the handover.
+
+## Handover to the glass Home
+
+- `cmd package set-home-activity` printed Success and changed nothing: tvlauncher's HOME filter has system priority 2,
+  any sideloaded launcher gets 0, and Android 9 only consults the preferred Home between equal priorities. So the
+  stock launcher cannot stay enabled *and* lose Home. With the owner's agreement it is disabled (not removed) through
+  its own list, `tv-state/home-takeover.txt`, applied with `tools/disable.sh` (whose Home guard allowed it because our
+  launcher answers HOME), then `set-home-activity com.gathin.tvhome/.GlassHome`.
+- Reboot: TV boots into GlassHome (`mFocusedApp` / `mCurrentFocus` = GlassHome), 30 packages disabled.
+- `tools/restore.sh tv-state/home-takeover.txt` re-enabled tvlauncher and Home resolved to it again (HOME showed Google
+  TV); re-applied afterwards.
+- Real remote, pressed by the owner: Home, Input/Source, Netflix/Prime/YouTube buttons, mic and Settings all work.
+- Keep list at the end: 27 of 28 enabled; the 28th, `com.google.android.tvlauncher`, is the deliberate handover above.
+
+`tools/bench.py --keys 24 --series 2 --cold 3 --returns 5 --idle 60` with the glass Home as Home:
+
+| | |
+|---|---|
+| idle PSS | **28 MB** (budget 60 MB; stock tvlauncher 78.8 MB) |
+| key response p50 / p95 | 23 / 33 ms |
+| focus movement p50 / p95 | 215 / 483 ms (180 ms zoom + 280 ms track slide by design) |
+| jank | 3.2 % of 897 frames |
+| cold start p50 | 412 ms |
+| return to Home p50 | 66 ms |
+| launcher idle CPU | 0.0 % |
+
+## Known gaps
+
+- Zee TV cannot tune the channel: no CEC device answers on HDMI 2 and CEC keys need a privileged permission.
+  It switches to HDMI 2 only; `zee_channel` is stored but unused.
+- Picture and Sleep open the general Settings screen (this firmware has no working picture or sleep-timer
+  intent); their hero line still reads "Opens the system ... screen".
+- HDMI 2 (Jio box) shows no signal dot while the box reports standby; the dot follows TvInputManager only.
+- Strings for the glass Home are English only; other locales fall back to English.
+- APK is 627 KB, above upstream's 512 KB CI gate (fine for this fork's 2 MB budget).
+- Two ADB keys were authorised during the session (tools/adbkey and the laptop's ~/.android/adbkey): revoke them.
+
+## How to restore everything
+
+From `C:\Users\Surendra\Projects\mitv-home` in Git Bash, with network debugging turned back on
+(Settings > Device Preferences > Developer options):
+```
+export TV_HOST=192.168.31.60
+tools/restore.sh ../mitv-home-tv-state/tv-state/home-takeover.txt   # stock launcher back, and Home with it
+tools/restore.sh ../mitv-home-tv-state/tv-state/disable.txt         # the 29 debloated packages back
+tools/theme.sh --reset                                               # optional: remove the glass theme overlay
+```
+Single app: `tools/tv.py 'pm enable com.xiaomi.mitv.updateservice'` (e.g. to check for a firmware update).
+Remove the launcher entirely, after the first line above: `tools/tv.py 'pm uninstall com.gathin.tvhome'` (it is
+our own app, not a system package). The recovery records `disable.sh` wrote are in `~/.cleanyourtv/`.
