@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Manrope at weight 500 for the glass Home, built once per process (see outfit_medium.xml). Android 8 ignores the
+     weight and draws the default instance; the system sans-serif stands in if the font cannot load. -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <font
+        android:font="@font/manrope"
+        android:fontStyle="normal"
+        android:fontWeight="500"
+        android:fontVariationSettings="'wght' 500"
+        tools:targetApi="28" />
+</font-family>
